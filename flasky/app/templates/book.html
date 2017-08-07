@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "_macros.html" as macros %}
+
+{% block title %}Flasky - {{ book.bookname }}{% endblock %}
+
+{% block page_content %}
+<div class="">
+    <img class="img-responsive" src="../static/{{ book.ISBN }}.jpg" width="10%">
+    <h1>{{ book.bookname }}</h1>
+    <div>
+        <a href="{{ url_for('.bookshop') }}">{{ book.bookname }}</a>
+        <a href="{{ url_for('.bookshop') }}">{{ book.author }}</a>
+        <a href="{{ url_for('.bookshop') }}">{{ book.press }}</a>
+        <a href="{{ url_for('.bookshop') }}">{{ book.ISBN }}</a>
+        <a href="{{ url_for('.bookshop') }}">{{ book.published_date }}</a>
+    </div>
+    <a href="#" class="btn btn-primary">更多介绍</a>
+    <div>
+        <h5>书主:</h5>
+        {% for lend in lends %}
+        <a>{{ lend.author.username }}</a>
+        <a href="{{ url_for('.user',username=lend.author.username) }}" class="btn btn-default">查看主页</a>
+        {% endfor %}
+    </div>
+    <div>
+        <h5>相关用户</h5>
+        {% for lend in lends %}
+        <a>{{ lend.author.username }}</a>
+        {% endfor %}
+    </div>
+    <div>
+        <h3>留言区</h3>
+        {{ wtf.quick_form(form) }}
+    </div>
+    <div class="post-tabs">
+        <ul class="nav nav-tabs">
+            <li{% if not show_followed %} class="active"{% endif %}><a href="{{ url_for('.show_all') }}">All</a></li>
+            {% if current_user.is_authenticated %}
+            <li{% if show_followed %} class="active"{% endif %}><a href="{{ url_for('.show_followed') }}">Followers</a></li>
+            {% endif %}
+        </ul>
+    {% include '_posts.html' %}
+    </div>
+    {% if pagination %}
+        <div class="pagination">
+            {{ macros.pagination_widget(pagination, '.index') }}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
