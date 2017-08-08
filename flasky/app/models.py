@@ -8,10 +8,8 @@ from flask import current_app, request, url_for
 from flask_login import UserMixin, AnonymousUserMixin
 from app.exceptions import ValidationError
 from . import db, login_manager, create_app
-
-# from whoosh.analysis import StemmingAnalyzer
+from whoosh.analysis import StemmingAnalyzer
 import flask_whooshalchemyplus
-# app = create_app('default')
 
 class Permission:
     FOLLOW = 0x01
@@ -391,21 +389,21 @@ class Comment(db.Model):
             raise ValidationError('comment does not have a body')
         return Comment(body=body)
 
-app = create_app('default')
 
 class Book(db.Model):
     __tablename__ = 'books'
-    __searchable__ = ['bookname','author','ISBN']
+    # __searchable__ = ['bookname','author','ISBN']
+    # __analyzer__ = SimpleAnalyzer()
     id = db.Column(db.Integer, primary_key=True)
-    bookname = app.db.Column(app.db.String(64))
-    author = app.db.Column(app.db.String(64))
+    bookname = db.Column(db.String(64))
+    author = db.Column(db.String(64))
     press = db.Column(db.String(64))
-    ISBN = app.db.Column(app.db.String(64), primary_key=True)
+    ISBN = db.Column(db.String(64), primary_key=True)
     published_date = db.Column(db.Date)
     lends = db.relationship('Lend', backref='book', lazy='dynamic')
 
 # app = create_app('default')
-flask_whooshalchemyplus.init_app(app)
+# flask_whooshalchemyplus.init_app(app)
 # flask_whooshalchemy.whoosh_index(app, Book)
 
 db.event.listen(Comment.body, 'set', Comment.on_changed_body)

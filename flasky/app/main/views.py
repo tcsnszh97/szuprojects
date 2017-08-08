@@ -100,18 +100,20 @@ def bookshop():
     books = Book.query.all()
     return render_template('bookshop.html', books=books)
 
-@main.route('/lend')
+@main.route('/lend', methods=['GET', 'POST'])
 def lend():
     form = LendForm()
-    if form.validate_on_submit():
-        if Book.query.filter_by(bookname=form.bookinfo.data).all():
-            books =Book.query.filter_by(bookname=form.bookinfo.data)
-        elif Book.query.filter_by(author=form.bookinfo.data).all():
-            books = Book.query.filter_by(author=form.bookinfo.data)
-        elif Book.query.filter_by(ISBN=form.bookinfo.data).all():
-            books = Book.query.filter_by(ISBN=form.bookinfo.data)
-        return redirect(url_for('.lend'))
-    return render_template('lend.html',form=form)
+    if not form.validate_on_submit():
+        # if Book.query.filter_by(bookname=form.bookinfo.data).all():
+        # books =Book.query.filter_by(bookname=form.bookinfo.data)
+        # elif Book.query.filter_by(author=form.bookinfo.data).all():
+        #     books = Book.query.filter_by(author=form.bookinfo.data)
+        # elif Book.query.filter_by(ISBN=form.bookinfo.data).all():
+        #     books = Book.query.filter_by(ISBN=form.bookinfo.data)
+        # return redirect(url_for('.lend'))
+        return render_template('lend.html',form=form)
+    return redirect(url_for('.lend',form=form))
+    # return render_template('lend.html',form=form)
 
 @main.route('/edit-profile', methods=['GET', 'POST'])
 @login_required

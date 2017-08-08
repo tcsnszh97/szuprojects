@@ -1,4 +1,5 @@
 import os
+from whoosh.analysis import StemmingAnalyzer
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 
@@ -20,7 +21,10 @@ class Config:
     FLASKY_FOLLOWERS_PER_PAGE = 50
     FLASKY_COMMENTS_PER_PAGE = 30
     FLASKY_SLOW_DB_QUERY_TIME=0.5
+
     WHOOSH_BASE = os.path.join(basedir, 'database_szu.db')
+    # WHOOSH_BASE = 'mysql://root:password@localhost/database_szu'
+    # WHOOSH_ANALYZER = StemmingAnalyzer()
 
     @staticmethod
     def init_app(app):
