@@ -1,4 +1,4 @@
-from flask import render_template, redirect, request, url_for, flash
+from flask import render_template, redirect, request, url_for, flash, g
 from flask_login import login_user, logout_user, login_required, \
     current_user
 from . import auth
@@ -7,10 +7,12 @@ from ..models import User
 from ..email import send_email
 from .forms import LoginForm, RegistrationForm, ChangePasswordForm,\
     PasswordResetRequestForm, PasswordResetForm, ChangeEmailForm
+from ..main.forms import SearchForm
 
 
 @auth.before_app_request
 def before_request():
+    g.search_form = SearchForm()
     if current_user.is_authenticated:
         current_user.ping()
         if not current_user.confirmed \

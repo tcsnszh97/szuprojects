@@ -6,8 +6,8 @@ from wtforms import ValidationError
 from flask_pagedown.fields import PageDownField
 from ..models import Role, User
 
-class LendForm(FlaskForm):
-    bookinfo = StringField('书名、作者、ISBN', validators=[Required()])
+class SearchForm(FlaskForm):
+    search = StringField('书名、作者、ISBN', validators=[Required()], render_kw={"placeholder": "书名、作者、ISBN"})
     submit = SubmitField('搜索')
 
 class NameForm(FlaskForm):

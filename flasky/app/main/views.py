@@ -1,10 +1,10 @@
 from flask import render_template, redirect, url_for, abort, flash, request,\
-    current_app, make_response
+    current_app, make_response, g
 from flask_login import login_required, current_user
 from flask_sqlalchemy import get_debug_queries
 from . import main
 from .forms import EditProfileForm, EditProfileAdminForm, PostForm,\
-    CommentForm, LendForm
+    CommentForm, SearchForm
 from .. import db
 from ..models import Permission, Role, User, Post, Comment, Book, Lend
 from ..decorators import admin_required, permission_required
@@ -70,6 +70,8 @@ def user(username):
 
 @main.route('/book/<book_isbn>')
 def book(book_isbn):
+
+    #评论部分
     form = PostForm()
     if current_user.can(Permission.WRITE_ARTICLES) and \
             form.validate_on_submit():
@@ -89,8 +91,12 @@ def book(book_isbn):
         page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
         error_out=False)
     posts = pagination.items
+    ##############
     book = Book.query.filter_by(ISBN=book_isbn).first_or_404()
-    lends = Lend.query.filter_by(id=book.id).first_or_404()
+    lends = Lend.query.filter_by(id=book.id).first()
+    print(lends)
+    print([lends])
+
     return render_template('book.html',posts=posts,
                            show_followed=show_followed, pagination=pagination,
                            form=form, book=book, lends=[lends])
@@ -102,18 +108,22 @@ def bookshop():
 
 @main.route('/lend', methods=['GET', 'POST'])
 def lend():
-    form = LendForm()
-    if not form.validate_on_submit():
-        # if Book.query.filter_by(bookname=form.bookinfo.data).all():
-        # books =Book.query.filter_by(bookname=form.bookinfo.data)
-        # elif Book.query.filter_by(author=form.bookinfo.data).all():
-        #     books = Book.query.filter_by(author=form.bookinfo.data)
-        # elif Book.query.filter_by(ISBN=form.bookinfo.data).all():
-        #     books = Book.query.filter_by(ISBN=form.bookinfo.data)
-        # return redirect(url_for('.lend'))
-        return render_template('lend.html',form=form)
-    return redirect(url_for('.lend',form=form))
-    # return render_template('lend.html',form=form)
+    return render_template('lend.html',form=g.search_form)
+
+@main.route('/search', methods=['GET', 'POST'])
+@login_required
+def search():
+    if not g.search_form.validate_on_submit():
+        return redirect(url_for('.lend'))
+    return redirect(url_for('.search_results',query=g.search_form.search.data))
+
+@main.route('/search_results/<query>')
+@login_required
+def search_results(query):
+    results = Book.query.filter(Book.ISBN.ilike('%'+query+'%')).all()
+    return render_template('search_results.html',
+    query = query,
+    results = results)
 
 @main.route('/edit-profile', methods=['GET', 'POST'])
 @login_required

@@ -3,22 +3,14 @@
 {% block title %}Flasky -{% endblock %}
 
 {% block page_content %}
-    <h1>出借我的图书</h1>
-
-<div class="col-md-8 col-sm-6">
-    <form class="form-inline">
-        <div class="form-group">
-            <label class="sr-only" for="exampleInputAmount">Amount (in dollars)</label>
-                <div class="input-group">
-                    <input type="text" class="form-control" id="exampleInputAmount" placeholder="书名、作者、ISBN">
-{#                    <div class="input-group-addon">.00</div>#}
-                </div>
-        </div>
-        <button type="submit" class="btn btn-primary">搜索</button>
-    </form>
-</div>
-    <div>{{ wtf.quick_form(form) }}
-    <a>{{ form.bookinfo.data}}</a>
+    <img class="img-responsive center-block" src="../static/lend-1.jpg" width="50%">
+    <div class="text-center">
+        <h1>出借我的图书</h1>
+        <form style="display: inline;" action="{{url_for('.search')}}" method="post" name="search">
+            {{g.search_form.hidden_tag()}}
+            {{g.search_form.search}}
+            <input type="submit" value="搜索">
+        </form>
     </div>
 
 

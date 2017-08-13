@@ -1,0 +1,28 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block page_content %}
+
+    <div>
+    <form style="display: inline;" action="{{url_for('.search')}}" method="post" name="search">
+        {{g.search_form.hidden_tag()}}
+        {{g.search_form.search}}
+        <input type="submit" value="Search">
+    </form>
+    </div>
+
+
+<h1>Search results for "{{query}}":</h1>
+<div>
+    {% for book in results %}
+        <div class="col-ms-16">
+            <img class="img-responsive col-md-2" src="../static/{{ book.ISBN }}.jpg" width="10%">
+            {{ book.bookname }}
+            {{ book.author }}
+            {{ book.press }}
+            {{ book.ISBN }}
+            {{ book.published_date }}
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}
