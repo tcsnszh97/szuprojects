@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}Flasky{% endblock %}
+
+{% block page_content %}
+<div>
+    <div class="col-md-2">
+        <img class="img-responsive" src="../static/{{ book.ISBN }}.jpg" width="100%">
+    </div>
+    <div>
+        <a href="{{ url_for('.bookshop') }}">{{ book.bookname }}</a>
+        <br><br><br>
+        {{ book.author }}
+        {{ book.press }}
+        {{ book.ISBN }}
+        {{ book.published_date }}
+    </div>
+    <div>
+        {{ wtf.quick_form(form) }}
+{#        <a href="bookshop.html" class="btn btn-primary">确认</a>#}
+{#        <a href="bookshop.html" class="btn btn-default">取消</a>#}
+    </div>
+</div>
+
+
+
+{% endblock %}

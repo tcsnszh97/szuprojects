@@ -10,6 +10,10 @@ class SearchForm(FlaskForm):
     search = StringField('书名、作者、ISBN', validators=[Required()], render_kw={"placeholder": "书名、作者、ISBN"})
     submit = SubmitField('搜索')
 
+class ApplyForm(FlaskForm):
+    submit = SubmitField('确认')
+
+
 class NameForm(FlaskForm):
     name = StringField('What is your name?', validators=[Required()])
     submit = SubmitField('Submit')

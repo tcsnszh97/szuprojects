@@ -60,6 +60,13 @@ class Follow(db.Model):
                             primary_key=True)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
+class Lend(db.Model):
+    __tablename__ = 'lends'
+    id = db.Column(db.Integer, primary_key=True)
+    book_id = db.Column(db.Integer, db.ForeignKey('books.id'))
+    lender_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    borrower_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    Borrowed = db.Column(db.Boolean, default=False)
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
@@ -76,7 +83,18 @@ class User(UserMixin, db.Model):
     last_seen = db.Column(db.DateTime(), default=datetime.utcnow)
     avatar_hash = db.Column(db.String(32))
     posts = db.relationship('Post', backref='author', lazy='dynamic')
-    lends = db.relationship('Lend', backref='author', lazy='dynamic')
+
+    lender = db.relationship('Lend',
+                               foreign_keys=[Lend.borrower_id],
+                               backref=db.backref('borrower', lazy='joined'),
+                               lazy='dynamic',
+                               cascade='all, delete-orphan')
+    borrower = db.relationship('Lend',
+                               foreign_keys=[Lend.lender_id],
+                               backref=db.backref('lender', lazy='joined'),
+                               lazy='dynamic',
+                               cascade='all, delete-orphan')
+
     followed = db.relationship('Follow',
                                foreign_keys=[Follow.follower_id],
                                backref=db.backref('follower', lazy='joined'),
@@ -286,13 +304,7 @@ login_manager.anonymous_user = AnonymousUser
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-
-
-class Lend(db.Model):
-    __tablename__ = 'lends'
-    id = db.Column(db.Integer, primary_key=True)
-    book_id = db.Column(db.Integer, db.ForeignKey('books.id'))
-    lender_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+#
 
 class Post(db.Model):
     __tablename__ = 'posts'

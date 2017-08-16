@@ -4,7 +4,7 @@ from flask_login import login_required, current_user
 from flask_sqlalchemy import get_debug_queries
 from . import main
 from .forms import EditProfileForm, EditProfileAdminForm, PostForm,\
-    CommentForm, SearchForm
+    CommentForm, SearchForm, ApplyForm
 from .. import db
 from ..models import Permission, Role, User, Post, Comment, Book, Lend
 from ..decorators import admin_required, permission_required
@@ -93,9 +93,7 @@ def book(book_isbn):
     posts = pagination.items
     ##############
     book = Book.query.filter_by(ISBN=book_isbn).first_or_404()
-    lends = Lend.query.filter_by(id=book.id).first()
-    print(lends)
-    print([lends])
+    lends = Lend.query.filter_by(book_id=book.id).first()
 
     return render_template('book.html',posts=posts,
                            show_followed=show_followed, pagination=pagination,
@@ -111,19 +109,50 @@ def lend():
     return render_template('lend.html',form=g.search_form)
 
 @main.route('/search', methods=['GET', 'POST'])
-@login_required
+# @login_required
 def search():
     if not g.search_form.validate_on_submit():
-        return redirect(url_for('.lend'))
+         return redirect(url_for('.lend'))
     return redirect(url_for('.search_results',query=g.search_form.search.data))
 
 @main.route('/search_results/<query>')
-@login_required
+# @login_required
 def search_results(query):
-    results = Book.query.filter(Book.ISBN.ilike('%'+query+'%')).all()
+    results = Book.query.filter(Book.ISBN.ilike('%'+query+'%')|Book.bookname.ilike('%'+query+'%')|Book.author.ilike('%'+query+'%')).all()
     return render_template('search_results.html',
     query = query,
     results = results)
+
+#lends_id是借阅表的id，用来确定借的是哪本书以及出借者是谁
+@main.route('/order/<lends_id>', methods=['GET', 'POST'])
+@login_required
+def order(lends_id):
+    lend = Lend.query.filter_by(id=lends_id).first()
+    if lend.Borrowed:
+        lend.borrower_id = None
+        lend.Borrowed = not lend.Borrowed
+        db.session.add(lend)
+    else:
+        lend.Borrowed = not lend.Borrowed
+        lend.borrower_id = current_user.id
+        db.session.add(lend)
+    return redirect(url_for('.book',book_isbn=lend.book.ISBN))
+
+
+
+@main.route('/apply/<book_isbn>',methods=['GET', 'POST'])
+@login_required
+def apply(book_isbn):
+    form = ApplyForm()
+    book = Book.query.filter_by(ISBN = book_isbn).first()
+    if form.validate_on_submit():
+        print('1a')
+        lend = Lend(book_id = book.id,lender_id = current_user.id)
+        db.session.add(lend)
+        print('1b')
+        return redirect(url_for('.bookshop'))
+    print(2)
+    return render_template('apply.html',book=book,form=form)
 
 @main.route('/edit-profile', methods=['GET', 'POST'])
 @login_required

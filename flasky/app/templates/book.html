@@ -6,9 +6,10 @@
 
 {% block page_content %}
 <div>
-    <img class="img-responsive" src="../static/{{ book.ISBN }}.jpg" width="10%">
-    <h1>{{ book.bookname }}</h1>
     <div>
+    <img class="img-responsive" src="../static/{{ book.ISBN }}.jpg" width="10%">
+    <h2> 书本基础信息 </h2>
+
         <a href="{{ url_for('.bookshop') }}">{{ book.bookname }}</a>
         <a href="{{ url_for('.bookshop') }}">{{ book.author }}</a>
         <a href="{{ url_for('.bookshop') }}">{{ book.press }}</a>
@@ -16,19 +17,32 @@
         <a href="{{ url_for('.bookshop') }}">{{ book.published_date }}</a>
     </div>
     <div>
+        <h2>出借人信息</h2>
         <h5>书主:</h5>
         {% for lend in lends %}
             {% if lend != None %}
-                <a>{{ lend.author.username }}</a>
-                <a href="{{ url_for('.user',username=lend.author.username) }}" class="btn btn-default">查看主页</a>
+                <a>{{ lend.lender.username }}</a>
+                <a href="{{ url_for('.user',username=lend.lender.username) }}" class="btn btn-default">查看主页</a>
+                {% if lend.Borrowed %}
+                    <h3 style="color: #ff0000;">已出借</h3>
+                    <h5>借阅者：{{ lend.borrower.username }}</h5>
+                    {% if current_user.username == lend.borrower.username %}
+                    <a href="{{ url_for('.order',lends_id=1) }}" class="btn btn-danger">取消订购</a>
+                    {% endif %}
+                {% else %}
+                    <a href="{{ url_for('.order',lends_id=1) }}" class="btn btn-primary">订购</a>
+                {% endif %}
+            {% else %}
+                <h5>无</h5>
             {% endif %}
         {% endfor %}
-    </div>
-    <div>
+
         <h5>相关用户：</h5>
         {% for lend in lends %}
             {% if lend != None %}
-                <a>{{ lend.author.username }}</a>
+                <a>{{ lend.lender.username }}</a>
+            {% else %}
+                <h5>无</h5>
             {% endif %}
         {% endfor %}
     </div>
@@ -52,9 +66,10 @@
 {#        </div>#}
 {#    {% endif %}#}
     <div>
-        <h2 style="color: #ff0000;">图书详情</h2>
+        <h2>基本详细信息</h2>
+        <h3 style="color: #ff0000;">图书详情</h3>
         <br>
-        <h2 style="color: #ff0000;">内容提要</h2>
+        <h3 style="color: #ff0000;">内容提要</h3>
     </div>
 
 </div>
