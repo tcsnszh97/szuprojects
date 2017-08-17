@@ -12,10 +12,8 @@
     </form>
 </div>
 
-
 <div class="row">
 <h1>搜索"{{query}}"的结果:</h1>
-<h2>选择你要出借的书籍:</h2>
     <ul>
         {% for book in results %}
             <li>
@@ -33,15 +31,19 @@
                         /{{ book.press }}
                         /{{ book.ISBN }}
                         /{{ book.published_date }}
-                        <br>
+                        <br><br><br><br><br><br><br>
                         <a href="{{url_for('.book',book_isbn=book.ISBN)}}">我要借阅</a>
                         <a href="{{url_for('.apply',book_isbn=book.ISBN)}}">我要出借</a>
-                        <br><br><br><br><br><br><br><br><br><br>
+                        <br><br><br><br><br><br><br>
                     </div>
                 </div>
             </li>
         {% endfor %}
     </ul>
+</div>
+
+<div>
+    <h5>没有找到您需要的书籍？请联系我们</h5>
 </div>
 
 {% endblock %}

@@ -19,7 +19,7 @@
     <div>
         {{ wtf.quick_form(form) }}
 {#        <a href="bookshop.html" class="btn btn-primary">确认</a>#}
-{#        <a href="bookshop.html" class="btn btn-default">取消</a>#}
+        <a href="{{ url_for('.bookshop')}}" class="btn btn-default">取消</a>
     </div>
 </div>
 

@@ -92,17 +92,22 @@ def book(book_isbn):
         error_out=False)
     posts = pagination.items
     ##############
-    book = Book.query.filter_by(ISBN=book_isbn).first_or_404()
-    lends = Lend.query.filter_by(book_id=book.id).first()
 
-    return render_template('book.html',posts=posts,
-                           show_followed=show_followed, pagination=pagination,
-                           form=form, book=book, lends=[lends])
+    book = Book.query.filter_by(ISBN=book_isbn).first_or_404()
+    # lends = Lend.query.filter_by(book_id=book.id).first()
+    notborrowed_book = Lend.query.filter_by(Borrowed=0,book_id=book.id).all()
+    borrowed_book = Lend.query.filter_by(Borrowed=1,book_id=book.id).all()
+
+    return render_template('book.html',
+                           posts=posts,show_followed=show_followed, pagination=pagination,form=form,
+                           book=book, notborrowed_book=notborrowed_book, borrowed_book=borrowed_book)
 
 @main.route('/bookshop')
 def bookshop():
-    books = Book.query.all()
-    return render_template('bookshop.html', books=books)
+    #已经被借的书和还未被借的书分开
+    notborrowed_book = Lend.query.filter_by(Borrowed=0).all()
+    borrowed_book = Lend.query.filter_by(Borrowed=1).all()
+    return render_template('bookshop.html', notborrowed_book=notborrowed_book, borrowed_book=borrowed_book)
 
 @main.route('/lend', methods=['GET', 'POST'])
 def lend():
