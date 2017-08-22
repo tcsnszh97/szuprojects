@@ -2,6 +2,7 @@ from flask import render_template, redirect, url_for, abort, flash, request,\
     current_app, make_response, g
 from flask_login import login_required, current_user
 from flask_sqlalchemy import get_debug_queries
+from sqlalchemy.sql import or_
 from . import main
 from .forms import EditProfileForm, EditProfileAdminForm, PostForm,\
     CommentForm, SearchForm, ApplyForm
@@ -53,14 +54,21 @@ def index():
         page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
         error_out=False)
     posts = pagination.items
-    return render_template('index.html', form=form, posts=posts,
-                           show_followed=show_followed, pagination=pagination)
+
+    lends = Lend.query.all()
+    return render_template('index.html',
+                           form=form, posts=posts,show_followed=show_followed, pagination=pagination,
+                           lends=lends)
 
 
 @main.route('/user/<username>')
 def user(username):
     user = User.query.filter_by(username=username).first_or_404()
     page = request.args.get('page', 1, type=int)
+    # pagination = user.posts.order_by(Post.timestamp.desc()).paginate(
+    #     page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
+    #     error_out=False)
+    # posts = pagination.items
     pagination = user.posts.order_by(Post.timestamp.desc()).paginate(
         page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
         error_out=False)
@@ -70,7 +78,6 @@ def user(username):
 
 @main.route('/book/<book_isbn>')
 def book(book_isbn):
-
     #评论部分
     form = PostForm()
     if current_user.can(Permission.WRITE_ARTICLES) and \
@@ -95,8 +102,8 @@ def book(book_isbn):
 
     book = Book.query.filter_by(ISBN=book_isbn).first_or_404()
     # lends = Lend.query.filter_by(book_id=book.id).first()
-    notborrowed_book = Lend.query.filter_by(Borrowed=0,book_id=book.id).all()
-    borrowed_book = Lend.query.filter_by(Borrowed=1,book_id=book.id).all()
+    notborrowed_book = Lend.query.filter_by(borrowed=0,book_id=book.id).all()
+    borrowed_book = Lend.query.filter_by(borrowed=1,book_id=book.id).all()
 
     return render_template('book.html',
                            posts=posts,show_followed=show_followed, pagination=pagination,form=form,
@@ -105,8 +112,8 @@ def book(book_isbn):
 @main.route('/bookshop')
 def bookshop():
     #已经被借的书和还未被借的书分开
-    notborrowed_book = Lend.query.filter_by(Borrowed=0).all()
-    borrowed_book = Lend.query.filter_by(Borrowed=1).all()
+    notborrowed_book = Lend.query.filter_by(borrowed=0).all()
+    borrowed_book = Lend.query.filter_by(borrowed=1).all()
     return render_template('bookshop.html', notborrowed_book=notborrowed_book, borrowed_book=borrowed_book)
 
 @main.route('/lend', methods=['GET', 'POST'])
@@ -133,12 +140,12 @@ def search_results(query):
 @login_required
 def order(lends_id):
     lend = Lend.query.filter_by(id=lends_id).first()
-    if lend.Borrowed:
+    if lend.borrowed:
         lend.borrower_id = None
-        lend.Borrowed = not lend.Borrowed
+        lend.borrowed = not lend.borrowed
         db.session.add(lend)
     else:
-        lend.Borrowed = not lend.Borrowed
+        lend.borrowed = not lend.borrowed
         lend.borrower_id = current_user.id
         db.session.add(lend)
     return redirect(url_for('.book',book_isbn=lend.book.ISBN))
@@ -156,8 +163,47 @@ def apply(book_isbn):
         db.session.add(lend)
         print('1b')
         return redirect(url_for('.bookshop'))
-    print(2)
     return render_template('apply.html',book=book,form=form)
+
+@main.route('/user-order', methods=['GET', 'POST'])
+@login_required
+def user_order():
+    show_lend = 0
+    if current_user.is_authenticated:
+        # show_lend = bool(request.cookies.get('show_lend', ''))
+        show_lend = str(request.cookies.get('show_lend', '0'))
+    if show_lend == '0':
+        #show_lend等于0，即借入订单，需要找到借入人是用户本身且已经通过申请的订单
+        lends = Lend.query.filter_by(borrower_id=current_user.id, received=1).all()
+    elif show_lend == '1':
+        # show_lend等于1，即借出订单，需要找到出借人是用户本身且已经通过申请的订单
+        lends = Lend.query.filter_by(lender_id=current_user.id, received=1).all()
+    else:
+        # 剩下的即show_lend等于2，申请列表，需要找到出借人或者申请者是用户本身且还未通过申请的订单
+        # lends = Lend.query.filter_by(borrower_id=current_user.id, received=0)
+        lends = Lend.query.filter(or_(Lend.lender_id == current_user.id,Lend.borrower_id == current_user.id)).filter(Lend.received==0).all()
+    return render_template('user_order.html', show_lend=show_lend, lends=lends)
+
+@main.route('/borrowed-order')
+@login_required
+def show_borrowed_order():
+    resp = make_response(redirect(url_for('.user_order')))
+    resp.set_cookie('show_lend', '0', max_age=30*24*60*60)
+    return resp
+
+@main.route('/lend-order')
+@login_required
+def show_lend_order():
+    resp = make_response(redirect(url_for('.user_order')))
+    resp.set_cookie('show_lend', '1', max_age=30*24*60*60)
+    return resp
+
+@main.route('/ordering')
+@login_required
+def show_ordering():
+    resp = make_response(redirect(url_for('.user_order')))
+    resp.set_cookie('show_lend', '2', max_age=30*24*60*60)
+    return resp
 
 @main.route('/edit-profile', methods=['GET', 'POST'])
 @login_required

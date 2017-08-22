@@ -66,7 +66,8 @@ class Lend(db.Model):
     book_id = db.Column(db.Integer, db.ForeignKey('books.id'))
     lender_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     borrower_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    Borrowed = db.Column(db.Boolean, default=False)
+    borrowed = db.Column(db.Boolean, default=False)
+    received = db.Column(db.Boolean, default=False)
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
