@@ -3,7 +3,7 @@
 {% block page_content %}
 <div class="page-header">
     <h1>订单管理</h1>
-<div class="post-tabs">
+<div>
     <ul class="nav nav-tabs">
         <li{% if show_lend == '0' %} class="active"{% endif %}><a href="{{ url_for('.show_borrowed_order') }}">借入订单</a></li>
         <li{% if show_lend == '1' %} class="active"{% endif %}><a href="{{ url_for('.show_lend_order') }}">借出订单</a></li>

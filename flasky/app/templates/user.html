@@ -21,34 +21,72 @@
         <p><a href="mailto:{{ user.email }}">{{ user.email }}</a></p>
         {% endif %}
         {% if user.about_me %}个性签名：<p>{{ user.about_me }}</p>{% endif %}
-        <p>Member since {{ moment(user.member_since).format('L') }}. Last seen {{ moment(user.last_seen).fromNow() }}.</p>
-        <p>{{ user.posts.count() }} blog posts. {{ user.comments.count() }} comments.</p>
+{#        <p>注册时间 {{ moment(user.member_since).format('L') }}. 最后一次登录 {{ moment(user.last_seen).fromNow() }}.</p>#}
+{#        <p>{{ user.posts.count() }} blog posts. {{ user.comments.count() }} comments.</p>#}
         <p>
             {% if current_user.can(Permission.FOLLOW) and user != current_user %}
                 {% if not current_user.is_following(user) %}
-                <a href="{{ url_for('.follow', username=user.username) }}" class="btn btn-primary">Follow</a>
+                <a href="{{ url_for('.follow', username=user.username) }}" class="btn btn-primary">关注</a>
                 {% else %}
-                <a href="{{ url_for('.unfollow', username=user.username) }}" class="btn btn-default">Unfollow</a>
+                <a href="{{ url_for('.unfollow', username=user.username) }}" class="btn btn-default">取消关注</a>
                 {% endif %}
             {% endif %}
-            <a href="{{ url_for('.followers', username=user.username) }}">Followers: <span class="badge">{{ user.followers.count() - 1 }}</span></a>
-            <a href="{{ url_for('.followed_by', username=user.username) }}">Following: <span class="badge">{{ user.followed.count() - 1 }}</span></a>
+            <a href="{{ url_for('.followers', username=user.username) }}">粉丝: <span class="badge">{{ user.followers.count() }}</span></a>
+            <a href="{{ url_for('.followed_by', username=user.username) }}">关注: <span class="badge">{{ user.followed.count() }}</span></a>
             {% if current_user.is_authenticated and user != current_user and user.is_following(current_user) %}
-            | <span class="label label-default">Follows you</span>
+            | <span class="label label-default">该用户正在关注你</span>
             {% endif %}
         </p>
         <p>
             {% if user == current_user %}
-            <a class="btn btn-default" href="{{ url_for('.edit_profile') }}">Edit Profile</a>
+            <a class="btn btn-default" href="{{ url_for('.edit_profile') }}">编辑资料</a>
             {% endif %}
             {% if current_user.is_administrator() %}
-            <a class="btn btn-danger" href="{{ url_for('.edit_profile_admin', id=user.id) }}">Edit Profile [Admin]</a>
+            <a class="btn btn-danger" href="{{ url_for('.edit_profile_admin', id=user.id) }}">编辑资料 [管理员]</a>
             {% endif %}
         </p>
     </div>
 </div>
-<h3>Posts by {{ user.username }}</h3>
-{% include '_posts.html' %}
+<h3>{{ user.username }}出借的图书</h3>
+    {% for lend in lends %}
+        {% if lend.received %}
+            <table class="user-order table table-bordered">
+                    <tbody class="order-wapper">
+                    <tr>
+                        <td>2017-09-07</td>
+                        <td>订单号：{{ lend.id }}</td>
+                        <td>正在借阅</td>
+                    </tr>
+                    </tbody>
+                    <tbody>
+                    <tr>
+                        <td class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+                            <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
+                                <a href="{{ url_for('.user', username=lend.lender.username) }}">
+                                    <img class="img-responsive center-block" src="../static/{{ lend.book.ISBN }}.jpg">
+                                </a>
+                            </div>
+                        </td>
+                        <td>
+                            {{ lend.book.bookname }}
+                            <br>
+                            {{ lend.book.author }}
+                            <br>
+                            {{ lend.book.press }}
+                            <br>
+                            {{ lend.book.published_date }}
+                        </td>
+                        <td>
+                            {{ lend.borrower.username }}(出借人)
+                            <br>
+                            {{ lend.borrower.username }}(借书人)
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+        {% endif %}
+        {% endfor %}
+
 {% if pagination %}
 <div class="pagination">
     {{ macros.pagination_widget(pagination, '.user', username=user.username) }}

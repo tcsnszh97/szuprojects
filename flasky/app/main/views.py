@@ -69,11 +69,12 @@ def user(username):
     #     page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
     #     error_out=False)
     # posts = pagination.items
-    pagination = user.posts.order_by(Post.timestamp.desc()).paginate(
+    query = Lend.query.filter_by(lender_id=user.id)
+    pagination = query.order_by(Lend.id.desc()).paginate(
         page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
         error_out=False)
-    posts = pagination.items
-    return render_template('user.html', user=user, posts=posts,
+    lends = pagination.items
+    return render_template('user.html', user=user, lends=lends,
                            pagination=pagination)
 
 @main.route('/book/<book_isbn>')
@@ -174,14 +175,14 @@ def user_order():
         show_lend = str(request.cookies.get('show_lend', '0'))
     if show_lend == '0':
         #show_lend等于0，即借入订单，需要找到借入人是用户本身且已经通过申请的订单
-        lends = Lend.query.filter_by(borrower_id=current_user.id, received=1).all()
+        lends = Lend.query.filter_by(borrower_id=current_user.id, borrowed=1).all()
     elif show_lend == '1':
         # show_lend等于1，即借出订单，需要找到出借人是用户本身且已经通过申请的订单
-        lends = Lend.query.filter_by(lender_id=current_user.id, received=1).all()
+        lends = Lend.query.filter_by(lender_id=current_user.id, borrowed=1).all()
     else:
         # 剩下的即show_lend等于2，申请列表，需要找到出借人或者申请者是用户本身且还未通过申请的订单
         # lends = Lend.query.filter_by(borrower_id=current_user.id, received=0)
-        lends = Lend.query.filter(or_(Lend.lender_id == current_user.id,Lend.borrower_id == current_user.id)).filter(Lend.received==0).all()
+        lends = Lend.query.filter(or_(Lend.lender_id == current_user.id,Lend.borrower_id == current_user.id)).filter(Lend.borrowed==0).all()
     return render_template('user_order.html', show_lend=show_lend, lends=lends)
 
 @main.route('/borrowed-order')
