@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% import "_macros.html" as macros %}
 
-{% block title %}Flasky - {{ user.username }}{% endblock %}
+{% block title %}Xiaopengu - {{ user.username }}{% endblock %}
 
 {% block page_content %}
 <div class="page-header">
@@ -47,15 +47,57 @@
         </p>
     </div>
 </div>
-<h3>{{ user.username }}出借的图书</h3>
-    {% for lend in lends %}
-        {% if lend.received %}
+<div>
+    <h3>{{ user.username }}出借的图书</h3>
+        {% for lend in lends %}
+        {% if not lend.borrower_id %}
             <table class="user-order table table-bordered">
                     <tbody class="order-wapper">
                     <tr>
                         <td>2017-09-07</td>
                         <td>订单号：{{ lend.id }}</td>
-                        <td>正在借阅</td>
+                        <td>等待借阅</td>
+                    </tr>
+                    </tbody>
+                    <tbody>
+                    <tr>
+                        <td class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+                            <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
+                                <a href="{{ url_for('.user', username=lend.lender.username) }}">
+                                    <img class="img-responsive center-block" src="../static/{{ lend.book.ISBN }}.jpg">
+                                </a>
+                            </div>
+                        </td>
+                        <td>
+                            {{ lend.book.bookname }}
+                            <br>
+                            {{ lend.book.author }}
+                            <br>
+                            {{ lend.book.press }}
+                            <br>
+                            {{ lend.book.published_date }}
+                        </td>
+                        <td>
+                            {{ lend.lender.username }}(出借人)
+                            <br>
+                            {% if lend.borrower.username %}
+                                {{ lend.borrower.username }}
+                            {% else %}
+                                无
+                            {% endif %}(借书人)
+                            <a href="{{ url_for('.book',book_isbn=lend.book.ISBN) }}" class="btn btn-primary">去借阅</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+        {% endif %}
+        {% if lend.borrowed %}
+            <table class="user-order table table-bordered">
+                    <tbody class="order-wapper">
+                    <tr>
+                        <td>2017-09-07</td>
+                        <td>订单号：{{ lend.id }}</td>
+                        <td>已经出借</td>
                     </tr>
                     </tbody>
                     <tbody>
@@ -86,6 +128,7 @@
                 </table>
         {% endif %}
         {% endfor %}
+</div>
 
 {% if pagination %}
 <div class="pagination">

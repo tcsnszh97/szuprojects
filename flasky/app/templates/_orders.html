@@ -38,7 +38,7 @@
                             {{ lend.book.published_date }}
                         </td>
                         <td>
-                            {{ lend.borrower.username }}(出借人)
+                            {{ lend.lender.username }}(出借人)
                             <br>
                             书籍配送中
                             <br>
@@ -95,7 +95,7 @@
                             {{ lend.book.published_date }}
                         </td>
                         <td>
-                            {{ lend.borrower.username }}(出借人)
+                            {{ lend.lender.username }}(出借人)
                             <br>
                             书籍配送中
                             <br>
@@ -156,7 +156,7 @@
                             {{ lend.book.published_date }}
                         </td>
                         <td>
-                            {{ lend.borrower.username }}(出借人)
+                            {{ lend.lender.username }}(出借人)
                             <br>
                             书籍配送中
                             <br>
@@ -212,7 +212,7 @@
                             {{ lend.book.published_date }}
                         </td>
                         <td>
-                            {{ lend.borrower.username }}(出借人)
+                            {{ lend.lender.username }}(出借人)
                             <br>
                             书籍配送中
                             <br>
@@ -240,7 +240,7 @@
 
 {% if show_lend == '2' %}
     <ul class="posts">
-        <h5>我的申请</h5>
+        <h4>我的申请</h4>
         {% for lend in lends %}
         {% if lend.borrower.id == current_user.id %}
             <table class="user-order table table-bordered">
@@ -273,7 +273,7 @@
                             {{ lend.book.published_date }}
                         </td>
                         <td>
-                            {{ lend.borrower.username }}(拥有者)
+                            {{ lend.lender.username }}(拥有者)
                             <br>
                             借书申请中
                             <br>
@@ -288,7 +288,7 @@
 {#                            </a>#}
                             <a href="#">
 {#                                <span class="label label-primary"> 确认收货</span>#}
-                                <button class="btn">取消申请</button>
+                                <button class="btn btn-danger">取消申请</button>
                             </a>
                         </td>
                     </tr>
@@ -296,9 +296,9 @@
                 </table>
         {% endif %}
         {% endfor %}
-        <h5>收到的申请</h5>
+        <h4>收到的申请</h4>
         {% for lend in lends %}
-        {% if lend.lender.id == current_user.id %}
+        {% if lend.lender.id == current_user.id and lend.borrower_id%}
             <table class="user-order table table-bordered">
                     <tbody class="order-wapper">
                     <tr>
@@ -329,7 +329,7 @@
                             {{ lend.book.published_date }}
                         </td>
                         <td>
-                            {{ lend.borrower.username }}(出借人)
+                            {{ lend.lender.username }}(出借人)
                             <br>
                             书籍配送中
                             <br>

@@ -47,63 +47,26 @@
                 {% for lend in lends %}
                 <div class="service-item">
                     <h3 class="title">{{ lend.book.bookname }}</h3>
-                    <div class="col-md-6 col-sm-3 col-xs-3">
+                    <div class="col-md-4 col-sm-4 col-xs-4">
                         <img class="img-responsive aligncenter" src="../static/{{ lend.book.ISBN }}.jpg">
                     </div>
-                    <p>Vestibulum facilisis ex eget ipsum congue, vel accumsan sapien dapibus Pellentesque ut quam id massa aliquet sodales.</p>
-                    <a href="#" class="btn btn-primary">Read More</a>
+                    <div class="text-left">
+                        <t> 拥有者：{{ lend.lender.username }} </t><br>
+                        <t>特有书号:{{ lend.id }}</t><br>
+                        <t>{{ lend.book.author }}</t><br>
+                        <t>{{ lend.book.press }}</t><br>
+                        <t>ISBN：{{ lend.book.ISBN }}</t><br>
+                        <t>{{ lend.book.published_date }}</t>
+{#                    <p>Vestibulum facilisis ex eget ipsum congue, vel accumsan sapien dapibus Pellentesque ut quam id massa aliquet sodales.</p>#}
+                    <a href="{{ url_for('.book',book_isbn=lend.book.ISBN) }}" class="btn btn-primary">Read More</a>
+                    </div>
                 </div>
                 {% endfor %}
-                <div class="service-item">
-                    <h3 class="title">Web Development</h3>
-                    <p>Vestibulum facilisis ex eget ipsum congue, vel accumsan sapien dapibus Pellentesque ut quam id massa aliquet sodales.</p>
-                    <a href="#" class="btn btn-primary">Read More</a>
-                </div>
-                <div class="service-item">
-                    <h3 class="title">Beanding & Packing</h3>
-                    <p>Vestibulum facilisis ex eget ipsum congue, vel accumsan sapien dapibus Pellentesque ut quam id massa aliquet sodales.</p>
-                    <a href="#" class="btn btn-primary">Read More</a>
-                </div>
-                <div class="service-item">
-                    <h3 class="title">Beanding & Packing</h3>
-                    <p>Vestibulum facilisis ex eget ipsum congue, vel accumsan sapien dapibus Pellentesque ut quam id massa aliquet sodales.</p>
-                    <a href="#" class="btn btn-primary">Read More</a>
-                </div>
-                <div class="service-item">
-                    <h3 class="title">Beanding & Packing</h3>
-                    <p>Vestibulum facilisis ex eget ipsum congue, vel accumsan sapien dapibus Pellentesque ut quam id massa aliquet sodales.</p>
-                    <a href="#" class="btn btn-primary">Read More</a>
-                </div>
-                <div class="service-item">
-                    <h3 class="title">Beanding & Packing</h3>
-                    <p>Vestibulum facilisis ex eget ipsum congue, vel accumsan sapien dapibus Pellentesque ut quam id massa aliquet sodales.</p>
-                    <a href="#" class="btn btn-primary">Read More</a>
-                </div>
-                <div class="service-item">
-                    <h3 class="title">Beanding & Packing</h3>
-                    <p>Vestibulum facilisis ex eget ipsum congue, vel accumsan sapien dapibus Pellentesque ut quam id massa aliquet sodales.</p>
-                    <a href="#" class="btn btn-primary">Read More</a>
-                </div>
-                <div class="service-item">
-                    <h3 class="title">Beanding & Packing</h3>
-                    <p>Vestibulum facilisis ex eget ipsum congue, vel accumsan sapien dapibus Pellentesque ut quam id massa aliquet sodales.</p>
-                    <a href="#" class="btn btn-primary">Read More</a>
-                </div>
-                <div class="service-item">
-                    <h3 class="title">Beanding & Packing</h3>
-                    <p>Vestibulum facilisis ex eget ipsum congue, vel accumsan sapien dapibus Pellentesque ut quam id massa aliquet sodales.</p>
-                    <a href="#" class="btn btn-primary">Read More</a>
-                </div>
-                <div class="service-item">
-                    <h3 class="title">Beanding & Packing</h3>
-                    <p>Vestibulum facilisis ex eget ipsum congue, vel accumsan sapien dapibus Pellentesque ut quam id massa aliquet sodales.</p>
-                    <a href="#" class="btn btn-primary">Read More</a>
-                </div>
-                <div class="service-item">
-                    <h3 class="title">Beanding & Packing</h3>
-                    <p>Vestibulum facilisis ex eget ipsum congue, vel accumsan sapien dapibus Pellentesque ut quam id massa aliquet sodales.</p>
-                    <a href="#" class="btn btn-primary">Read More</a>
-                </div>
+{#                <div class="service-item">#}
+{#                    <h3 class="title">Beanding & Packing</h3>#}
+{#                    <p>Vestibulum facilisis ex eget ipsum congue, vel accumsan sapien dapibus Pellentesque ut quam id massa aliquet sodales.</p>#}
+{#                    <a href="#" class="btn btn-primary">Read More</a>#}
+{#                </div>#}
             </div>
         </div>
     </section>
@@ -123,7 +86,7 @@
                             除了教材外还有很多想与校友分享的图书？统统可以借给需要的人哦，我们来帮你找到志同道合的人。
                         </h4>
                         <p>❤xiaopengu 衷心的感谢所有愿意将自己的宝贝书籍借给其他人的同学❤</p>
-                        <a href="#" class="btn btn-primary ">出借图书</a>
+                        <a href="{{ url_for('main.lend') }}" class="btn btn-primary ">出借图书</a>
                     </div>
                 </div>
             </div>
@@ -140,7 +103,7 @@
                         <h4>
                            除了教材还可以找找看有没有自己想看了很久的那本书哦，说不定已经有同学良心的把他放在出借列表了。
                         </h4>
-                        <a href="#" class="btn btn-primary btn-wide btn-icon">搜索图书
+                        <a href="{{ url_for('main.bookshop', username=current_user.username) }}" class="btn btn-primary btn-wide btn-icon">搜索图书
 {#                            <i class="fa fa-angle-right" aria-hidden="true"></i>#}
                         </a>
                     </div>
@@ -195,9 +158,9 @@
 
     <div class="jumbotron">
          <div class="container">
-            <h1>Hello, world!</h1>
-            <p>This is a template for a simple marketing or informational website. It includes a large callout called a jumbotron and three supporting pieces of content. Use it as a starting point to create something more unique.</p>
-            <p><a class="btn btn-primary btn-lg" href="#" role="button">Learn more &raquo;</a></p>
+            <h2>查看订单</h2>
+            <p> 前几天申请的书籍不知道出借人看到了没有？点击此处查看订单管理界面，对方接受了就可以开始联系对方了。 </p>
+            <p><a class="btn btn-primary btn-lg" href=" {{url_for('.user_order') }}" role="button">订单管理 &raquo;</a></p>
         </div>
     </div>
 

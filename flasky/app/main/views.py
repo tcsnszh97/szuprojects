@@ -103,7 +103,7 @@ def book(book_isbn):
 
     book = Book.query.filter_by(ISBN=book_isbn).first_or_404()
     # lends = Lend.query.filter_by(book_id=book.id).first()
-    notborrowed_book = Lend.query.filter_by(borrowed=0,book_id=book.id).all()
+    notborrowed_book = Lend.query.filter(Lend.borrowed==0,Lend.book_id==book.id).filter(or_(Lend.borrower_id==0,Lend.borrower_id==None)).all()
     borrowed_book = Lend.query.filter_by(borrowed=1,book_id=book.id).all()
 
     return render_template('book.html',
@@ -113,7 +113,7 @@ def book(book_isbn):
 @main.route('/bookshop')
 def bookshop():
     #已经被借的书和还未被借的书分开
-    notborrowed_book = Lend.query.filter_by(borrowed=0).all()
+    notborrowed_book = Lend.query.filter(Lend.borrowed==0).filter(or_(Lend.borrower_id==0, Lend.borrower_id==None)).all()
     borrowed_book = Lend.query.filter_by(borrowed=1).all()
     return render_template('bookshop.html', notborrowed_book=notborrowed_book, borrowed_book=borrowed_book)
 
@@ -141,15 +141,17 @@ def search_results(query):
 @login_required
 def order(lends_id):
     lend = Lend.query.filter_by(id=lends_id).first()
+    #被借->空闲
     if lend.borrowed:
         lend.borrower_id = None
         lend.borrowed = not lend.borrowed
         db.session.add(lend)
+    # 空闲->被借
     else:
-        lend.borrowed = not lend.borrowed
+        # lend.borrowed = not lend.borrowed
         lend.borrower_id = current_user.id
         db.session.add(lend)
-    return redirect(url_for('.book',book_isbn=lend.book.ISBN))
+    return redirect(url_for('.user_order',show_lend='2'))
 
 
 
@@ -159,10 +161,8 @@ def apply(book_isbn):
     form = ApplyForm()
     book = Book.query.filter_by(ISBN = book_isbn).first()
     if form.validate_on_submit():
-        print('1a')
-        lend = Lend(book_id = book.id,lender_id = current_user.id)
+        lend = Lend(book_id = book.id,lender_id = current_user.id,borrowed=0,received=0)
         db.session.add(lend)
-        print('1b')
         return redirect(url_for('.bookshop'))
     return render_template('apply.html',book=book,form=form)
 

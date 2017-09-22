@@ -2,7 +2,7 @@
 {% import "bootstrap/wtf.html" as wtf %}
 {% import "_macros.html" as macros %}
 
-{% block title %}Flasky{% endblock %}
+{% block title %}Xiaopengu{% endblock %}
 
 
 {% block page_content %}
@@ -24,7 +24,7 @@
         </div>
         <div class="col-md-6">
             <div id="name">
-                {{ book.bookname }}
+                <h2>{{ book.bookname }}</h2>
             </div>
             <div class="detail-info">
 
@@ -41,17 +41,15 @@
                         ISBN：
                         <a href="{{ url_for('.bookshop') }}">{{ book.ISBN }}</a>
                     </li>
-                </ul>
-                <ul>
                     <li class="t1">
                         出版日期：
                         <a href="{{ url_for('.bookshop') }}">{{ book.published_date }}</a>
                     </li>
 
-                    <li class="t2">
-                        库存：
-                        <a href="{{ url_for('.bookshop') }}">剩余库存库存库存</a>
-                    </li>
+{#                    <li class="t2">#}
+{#                        库存：#}
+{#                        <a href="{{ url_for('.bookshop') }}">剩余库存库存库存</a>#}
+{#                    </li>#}
                 </ul>
             </div>
 {#            <div class="row" style="padding: 10px;">#}
@@ -70,9 +68,9 @@
                 </div>
                 {% for lend in notborrowed_book %}
                 <ul>
-                    <a>{{ lend.lender.username }}</a>
+                    <t>用户名：{{ lend.lender.username }}</t><t>  特有书号：{{ lend.id }}</t>
                     <!-- 按钮触发模态框 -->
-                    <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">订购</button>
+                    <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">借阅</button>
                     <!-- 模态框（Modal） -->
                     <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
                          aria-hidden="true">
@@ -85,8 +83,8 @@
                                 </div>
                                 <div class="modal-body">是否确定提交借书订单</div>
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-primary" href="{{ url_for('.order',lends_id=lend.id) }}">提交</button>
-                                    <a href="{{ url_for('.order',lends_id=lend.id) }}" class="btn btn-primary">确定</a>
+{#                                    <button type="button" class="btn btn-primary" href="{{ url_for('.order',lends_id=lend.id) }}">提交</button>#}
+                                    <a href="{{ url_for('.order',lends_id=lend.id) }}" class="btn btn-primary">提交</a>
                                     <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
                                 </div>
                             </div><!-- /.modal-content -->
@@ -96,7 +94,7 @@
                 {% endfor %}
                 {% for lend in borrowed_book %}
                 <ul>
-                    <a>{{ lend.lender.username }}</a>
+                    <t>用户名：{{ lend.lender.username }}</t><t>  特有书号：{{ lend.id }}</t>
                     <button type="button" class="btn btn-danger btn-lg disabled" href="#">已出借</button>
                 </ul>
                 {% endfor %}
@@ -117,15 +115,16 @@
                     </ul>
                 </div>
             </div>
-            <p>内容内容内容内容内容内容内容内容
+            <h5> 内容内容内容内容内容内容内容内容
                 内容内容内容内容内容内容内容内容
-            </p>
+            </h5>
             <div class="col-md-12">
                 <div class="txt-hd" id="book-abstract">
                     <h5>内容摘要</h5>
                 </div>
                 <div class="txt-bd">
                     <div class="content">
+                        <br>
                         摘要内容摘要内容摘要内容摘要内容摘要内容摘要内容<br/>
                         摘要内容摘要内容摘要内容摘要内容摘要内容摘要内容<br/>
                         摘要内容摘要内容摘要内容摘要内容摘要内容摘要内容<br/>
@@ -142,6 +141,7 @@
                 </div>
                 <div class="txt-bd">
                     <div class="content">
+                        <br>
                         目录目录目录目录目录目录目录<br/>
                         目录目录目录目录目录目录目录<br/>
                         目录目录目录目录目录目录目录<br/>
