@@ -131,7 +131,7 @@ def search():
 @main.route('/search_results/<query>')
 # @login_required
 def search_results(query):
-    results = Book.query.filter(Book.ISBN.ilike('%'+query+'%')|Book.bookname.ilike('%'+query+'%')|Book.author.ilike('%'+query+'%')).all()
+    results = Book.query.filter(Book.ISBN.ilike(query)|Book.bookname.ilike('%'+query+'%')|Book.author.ilike('%'+query+'%')).all()
     return render_template('search_results.html',
     query = query,
     results = results)

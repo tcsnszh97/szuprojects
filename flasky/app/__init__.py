@@ -6,8 +6,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_pagedown import PageDown
 from config import config
-import flask_whooshalchemyplus
-from flask_whooshalchemyplus import index_all
+# import flask_whooshalchemyplus
+# from flask_whooshalchemyplus import index_all
 
 bootstrap = Bootstrap()
 mail = Mail()

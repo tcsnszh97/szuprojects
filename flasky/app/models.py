@@ -8,8 +8,8 @@ from flask import current_app, request, url_for
 from flask_login import UserMixin, AnonymousUserMixin
 from app.exceptions import ValidationError
 from . import db, login_manager, create_app
-from whoosh.analysis import StemmingAnalyzer
-import flask_whooshalchemyplus
+#from whoosh.analysis import StemmingAnalyzer
+#import flask_whooshalchemyplus
 
 class Permission:
     FOLLOW = 0x01
